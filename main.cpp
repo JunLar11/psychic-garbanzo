@@ -31,7 +31,6 @@ Se van a crear cuatro estructuras:
 */
 
 #include "components/menus.hpp"
-#include "components/lab.hpp"
 
 #define SUPERUSER 13032024
 #define SUPERPASS "SPadBal2024"
@@ -116,6 +115,12 @@ void login();
 void solicitarContrasena(string &password);
 
 int main() {
+    //Creando los archivos de texto necesarios
+    creadorArchivos(LAB_TABLE_NAME);
+    creadorArchivos(MATERIALS_TABLE_NAME);
+    creadorArchivos(BORROW_TABLE_NAME);
+    creadorArchivos(USERS_TABLE_NAME);
+
     // Obtener el manejador de la ventana de consola
     HWND hwnd = GetConsoleWindow();
 
@@ -135,54 +140,3 @@ int main() {
     return 0;
 }
 
-/**
- * @brief Función para iniciar sesión.
- * 
- * Esta función solicita al usuario que ingrese su ID de usuario y contraseña.
- * Luego, establece el ID de usuario y el estado de conexión en la estructura CurrentlyLoggedUser.
- * Si el ID de usuario y la contraseña corresponden a un superusuario, se establece el nivel de acceso del usuario en CurrentlyLoggedUser a verdadero.
- * De lo contrario, se establece a falso.
- */
-void login() {
-    int userID; ///< Variable para almacenar el ID de usuario ingresado.
-    string pass; ///< Variable para almacenar la contraseña ingresada.
-    int intentos=0;///< Variable para almacenar el número de intentos.
-    cout << "Ingrese su userID de usuario: "; ///< Solicita al usuario que ingrese su ID de usuario.
-    cin >> userID; ///< Almacena el ID de usuario ingresado en la variable userID.
-    cin.ignore(); ///< Limpia la entrada de la pantalla.
-    fflush(stdin); ///< Limpia la entrada de la pantalla.
-    cout << "Ingrese su contraseña: "; ///< Solicita al usuario que ingrese su contraseña.
-    solicitarContrasena(pass); ///< Almacena la contraseña ingresada en la variable pass.
-    // cin.ignore(); ///< Limpia la entrada de la pantalla.
-    // fflush(stdin); ///< Limpia la entrada de la pantalla.
-    CurrentlyLoggedUser::s_userID(userID); ///< Establece el ID de usuario en la estructura CurrentlyLoggedUser.
-
-    CurrentlyLoggedUser::s_logged(true); ///< Establece el estado de conexión en la estructura CurrentlyLoggedUser a verdadero.
-    if (userID == SUPERUSER && pass == SUPERPASS) { ///< Comprueba si el ID de usuario y la contraseña corresponden a un superusuario.
-        CurrentlyLoggedUser::s_userAccessLevel(true); ///< Si es un superusuario, establece el nivel de acceso en la estructura CurrentlyLoggedUser a verdadero.
-    } else {
-        CurrentlyLoggedUser::s_userAccessLevel(false); ///< Si no es un superusuario, establece el nivel de acceso en la estructura CurrentlyLoggedUser a falso.
-    }
-    cout<<userID<<endl;
-    cout<<pass<<endl;
-    cout<<"Probando"<<endl;
-    getline(cin, pass, '\n');
-
-
-    return; ///< Termina la función.
-}
-
-void solicitarContrasena(string &password) {
-    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
-    DWORD mode = 0;
-    GetConsoleMode(hStdin, &mode);
-
-    SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT));
-
-    
-    getline(cin, password, '\n');
-
-    SetConsoleMode(hStdin, mode);
-
-    return;
-}
