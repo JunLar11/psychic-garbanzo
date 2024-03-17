@@ -6,5 +6,8 @@
 #include<stdlib.h>
 #include<string>
 #include<locale>
+#include <windows.h>
+
+#define IDI_ICON1 101
 
 using namespace std;

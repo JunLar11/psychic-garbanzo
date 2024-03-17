@@ -66,10 +66,22 @@ bool currentlLogged::accessLevel = false;
 void login();
 
 int main() {
+    // Obtener el manejador de la ventana de consola
+    HWND hwnd = GetConsoleWindow();
+
+    // Establecer el ícono de la ventana de consola
+    // HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
+    // SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+    // SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+
+    SetConsoleTitleA("Lab. Admin");
+
+    // Mostrar la ventana de consola en la barra de tareas
+    ShowWindow(hwnd, SW_SHOW);
     login();
     mainMenu();
     system("pause");
-    
+    exit(0);
     return 0;
 }
 
