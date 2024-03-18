@@ -7,7 +7,7 @@
 #include<string>
 #include<locale>
 #include<windows.h>
-#include<fstream> 
+#include<fstream>
 
 #define IDI_ICON1 101
 

@@ -1,5 +1,10 @@
 //Código para el manejo de los laboratoristas
-#include "lab.hpp"
+
+#include "headers/sessions.hpp"
+#include "headers/lab.hpp"
+
+
+//CurrentlyLoggedUser currentSession; ///< Estructura para almacenar el estado de conexión y el nivel de acceso del usuario actual.
 
 void solicitarContrasena(string &password) {
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
@@ -38,6 +43,19 @@ bool verifyPassword(string &passWord, string &passWordCiphered){
     return false;
 }
 
+bool searchLaboratorista(string &labID, string &result) {
+    ifstream file("laboratorios.txt");
+    string line;
+    while (getline(file, line)) {
+        if (line.find(labID) != string::npos) {
+            result = line;
+            return true;
+        }
+    }
+    return false;
+}
+
+
 /**
  * @brief Función para iniciar sesión.
  * 
@@ -58,19 +76,20 @@ void login() {
     solicitarContrasena(pass); ///< Almacena la contraseña ingresada en la variable pass.
     // cin.ignore(); ///< Limpia la entrada de la pantalla.
     // fflush(stdin); ///< Limpia la entrada de la pantalla.
+    CurrentlyLoggedUser::s_userAccessLevel(false);
     CurrentlyLoggedUser::s_userID(userID); ///< Establece el ID de usuario en la estructura CurrentlyLoggedUser.
 
     CurrentlyLoggedUser::s_logged(true); ///< Establece el estado de conexión en la estructura CurrentlyLoggedUser a verdadero.
     if (userID == SUPERUSER && pass == SUPERPASS) { ///< Comprueba si el ID de usuario y la contraseña corresponden a un superusuario.
         CurrentlyLoggedUser::s_userAccessLevel(true); ///< Si es un superusuario, establece el nivel de acceso en la estructura CurrentlyLoggedUser a verdadero.
     } else {
+        //if()
         CurrentlyLoggedUser::s_userAccessLevel(false); ///< Si no es un superusuario, establece el nivel de acceso en la estructura CurrentlyLoggedUser a falso.
     }
-    cout<<userID<<endl;
-    cout<<pass<<endl;
-    cout<<"Probando"<<endl;
-    getline(cin, pass, '\n');
+    
+
 
 
     return; ///< Termina la función.
 }
+
