@@ -58,7 +58,7 @@ int main() {
     // SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
     // SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 
-    SetConsoleTitleA("Lab. Admin");
+    SetConsoleTitleA("Administrador");
 
     // Mostrar la ventana de consola en la barra de tareas
     ShowWindow(hwnd, SW_SHOW);

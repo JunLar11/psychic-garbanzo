@@ -8,6 +8,7 @@
 #include<locale>
 #include<windows.h>
 #include<fstream>
+#include <sstream>
 
 #define IDI_ICON1 101
 
