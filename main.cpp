@@ -31,6 +31,7 @@ Se van a crear cuatro estructuras:
 */
 
 #include "components/headers/menus.hpp"
+#include "components/headers/sessions.hpp"
 
 
 
@@ -42,7 +43,8 @@ using namespace std;
 
 
 int main() {
-
+   bool remainInProgram=false;
+    setlocale(LC_CTYPE, "spanish");
     locale::global(locale("es_ES.utf8"));
     //Creando los archivos de texto necesarios
     creadorArchivos(LAB_TABLE_NAME);
@@ -62,8 +64,20 @@ int main() {
 
     // Mostrar la ventana de consola en la barra de tareas
     ShowWindow(hwnd, SW_SHOW);
-    login();
-    mainMenu();
+
+    do{
+      if(!CurrentlyLoggedUser::g_logged()){
+         login();
+      }
+      if(CurrentlyLoggedUser::g_logged()){
+         remainInProgram=mainMenu();
+      }
+      if(!remainInProgram){
+         CurrentlyLoggedUser::logout();
+      }
+      system("cls");
+    }while(remainInProgram);
+    cout<<"PROGRAMA FINALIZADO CON EXITO"<<endl;
     system("pause");
     exit(0);
     return 0;

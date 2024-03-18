@@ -1,7 +1,8 @@
 #pragma once 
 #include "prjheaders.hpp"
-#define SUPERUSER 13032024
+#define SUPERUSER "13032024"
 #define SUPERPASS "SPadBal2024"
+
 
 /**
  * @struct CurrentlyLoggedUser
@@ -14,7 +15,7 @@ struct CurrentlyLoggedUser {
 
     
 private:
-    static int userID; ///< El ID del usuario actualmente conectado.
+    static string userID; ///< El ID del usuario actualmente conectado.
     static bool userAccessLevel; ///< El nivel de acceso del usuario actualmente conectado. Verdadero para acceso de alto nivel, falso para acceso de bajo nivel.
     static bool logged; ///< El estado de conexión del usuario. Verdadero si el usuario está conectado, falso de lo contrario.
     static string name; ///< El nombre del usuario actualmente conectado.
@@ -23,9 +24,9 @@ public:
     /**
      * @brief Obtener el ID del usuario
      * 
-     * @return int El ID del usuario actualmente conectado.
+     * @return string El ID del usuario actualmente conectado.
      */
-    static int g_userID() {
+    static string g_userID() {
         return CurrentlyLoggedUser::userID;
     }
 
@@ -34,7 +35,7 @@ public:
      * 
      * @param _userID El nuevo ID de usuario a establecer.
      */
-    static void s_userID(int _userID) {
+    static void s_userID(string _userID) {
         CurrentlyLoggedUser::userID = _userID;
     }
 
@@ -91,9 +92,24 @@ public:
     static void s_name(string _name) {
         CurrentlyLoggedUser::name = _name;
     }
-}; ///< Una instancia de la estructura CurrentlyLoggedUser para representar al usuario actualmente conectado.
 
-int CurrentlyLoggedUser::userID = 0;
-bool CurrentlyLoggedUser::userAccessLevel = false;
-bool CurrentlyLoggedUser::logged = false;
-string CurrentlyLoggedUser::name = "";
+    //Métodos
+    private:
+    static void setSession(string _name, bool _logged, string _uID, bool _accessLevel=false){
+        CurrentlyLoggedUser::name = _name;
+        CurrentlyLoggedUser::logged = _logged;
+        CurrentlyLoggedUser::userID = _uID;
+        CurrentlyLoggedUser::userAccessLevel = _accessLevel;
+    }
+
+    public:
+    static void login(string _name, bool _logged, string _uID, bool _accessLevel=false){
+        setSession(_name, _logged, _uID, _accessLevel);
+    }
+
+    static void logout(){
+        setSession("", false, 0);
+    }
+
+
+}; ///< Una instancia de la estructura CurrentlyLoggedUser para representar al usuario actualmente conectado.

@@ -9,4 +9,5 @@
 
 
 
-void mainMenu();
+bool mainMenu();
+bool userMenu(vector<User> &users);

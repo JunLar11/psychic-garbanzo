@@ -1,8 +1,8 @@
 //Código para el manejo de los laboratoristas
 
-#include "headers/sessions.hpp"
+//#include "headers/sessions.hpp"
 #include "headers/lab.hpp"
-
+#include "headers/sessioninit.hpp"
 
 //Métodos de la estructura Laboratorista
 Laboratorista::Laboratorista(string id, string nombre, string password, string telefono, string turn) {
@@ -20,7 +20,7 @@ Laboratorista::Laboratorista(string &registro){
 }
 
 Laboratorista::Laboratorista() {
-    this->id = "0";
+    this->id = "";
     this->nombre = "";
     this->password = "";
     this->telefono = "";
@@ -69,14 +69,14 @@ void Laboratorista::setTurno(string turno) {
 
 void Laboratorista::getFromString(string &registro) {
     stringstream ss(registro);
-    string id, nombre, password, telefono, turno;
-    getline(ss, id, ',');
+    string nombre, password, telefono,_id,turno;
+    getline(ss, _id, ',');
     getline(ss, nombre, ',');
     getline(ss, password, ',');
     getline(ss, telefono, ',');
     getline(ss, turno, ';');
 
-    this->id = id;
+    this->id = _id;
     this->nombre = nombre;
     this->password = password;
     this->telefono = telefono;
@@ -125,8 +125,8 @@ bool verifyPassword(string &passWord, string &passWordCiphered){
     return false;
 }
 
-bool searchLaboratorista(int &labID, string &result) {
-    ifstream file("laboratorios.txt");
+bool searchLaboratorista(string &labID, string &result) {
+    ifstream file(LAB_TABLE_NAME, ios::in);
     string line;
     while (getline(file, line,'\n')) {
         if (line.find(labID) != string::npos) {
@@ -151,7 +151,7 @@ void parseLaboratorista(string &line, Laboratorista &lab) {
  * De lo contrario, se establece a falso.
  */
 void login() {
-    int userID; ///< Variable para almacenar el ID de usuario ingresado.
+    string userID; ///< Variable para almacenar el ID de usuario ingresado.
     string pass; ///< Variable para almacenar la contraseña ingresada.
     string registro; ///< Variable para almacenar el registro de usuario ingresado.
     int intentos=0;///< Variable para almacenar el número de intentos.
@@ -172,20 +172,13 @@ void login() {
         // cin.ignore(); ///< Limpia la entrada de la pantalla.
         // fflush(stdin); ///< Limpia la entrada de la pantalla.
         if (userID == SUPERUSER && pass == SUPERPASS) { ///< Comprueba si el ID de usuario y la contraseña corresponden a un superusuario.
-            CurrentlyLoggedUser::s_userAccessLevel(true); ///< Si es un superusuario, establece el nivel de acceso en la estructura CurrentlyLoggedUser a verdadero.
-            CurrentlyLoggedUser::s_userID(SUPERUSER); ///< Establece el ID de usuario en la estructura CurrentlyLoggedUser.
-            CurrentlyLoggedUser::s_logged(true); ///< Establece el estado de conexión en la estruct
-            CurrentlyLoggedUser::s_name("Administrador"); ///< Establece el nombre en la estructura CurrentlyLoggedUser.
+            CurrentlyLoggedUser::login("Administrador", true, SUPERUSER,true); ///< Establece el ID de usuario y el estado de conexión en la estructura CurrentlyLoggedUser.
             return; ///< Termina la función.
         }else if(searchLaboratorista(userID, registro)){
             lab.getFromString(registro);
             if(verifyPassword(pass, registro)){
-                cout << "Bienvenido " << userID << endl;
-                CurrentlyLoggedUser::s_userAccessLevel(false);
-                CurrentlyLoggedUser::s_userID(userID); ///< Establece el ID de usuario en la estructura CurrentlyLoggedUser.
-                CurrentlyLoggedUser::s_logged(true); ///< Establece el estado de conexión en la estructura CurrentlyLoggedUser a verdadero.
-                CurrentlyLoggedUser::s_name(lab.getNombre()); ///< Establece el nombre en la estructura CurrentlyLoggedUser.
-                return;
+                CurrentlyLoggedUser::login(lab.getNombre(), true, lab.getId());
+                return; 
             }else{
                 cout << "Contraseña incorrecta" << endl;
                 

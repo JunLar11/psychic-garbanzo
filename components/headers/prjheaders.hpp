@@ -9,6 +9,8 @@
 #include<windows.h>
 #include<fstream>
 #include <sstream>
+#include<stdio.h>
+#include<vector>
 
 #define IDI_ICON1 101
 

@@ -8,11 +8,36 @@ string exePathGetter(){
     }
     string pathStr = path;
     size_t pos = pathStr.find_last_of("\\/");
-    if (pos != std::string::npos) {
+    if (pos != string::npos) {
         pathStr = pathStr.substr(0, pos);
     }
 
     return pathStr+"\\";
+}
+
+void updateLine(string filename, string &searchText, string &newLine) {
+    ifstream inFile(filename, ios::in);
+    vector<string> lines;
+    string line;
+
+    // Lee todas las líneas del archivo
+    while (getline(inFile, line)) {
+        // Si la línea contiene el texto de búsqueda, la actualiza
+        if (line.find(searchText) != string::npos) {
+            line = newLine;
+        }
+        lines.push_back(line);
+    }
+
+    inFile.close();
+
+    // Escribe las líneas de nuevo al archivo
+    ofstream outFile(filename);
+    for (const auto &line : lines) {
+        outFile << line << endl;
+    }
+
+    outFile.close();
 }
 
 void creadorArchivos(string fileName){
@@ -37,3 +62,4 @@ void creadorArchivos(string fileName){
 
     return;
 }
+
