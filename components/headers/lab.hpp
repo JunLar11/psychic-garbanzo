@@ -35,6 +35,21 @@ struct Laboratorista {
     void setTurno(string turno);
     //Functions
     void getFromString(string &registro);
+
+    void show(){
+
+        cout<<"ID: "<<this->id<<endl;
+        cout<<"Nombre: "<<this->nombre<<endl;
+        cout<<"Telefono: "<<this->telefono<<endl;
+        cout<<"Turno: "<<this->turno<<endl;
+        //cout<<"Password: "<<this->password<<endl;
+    }
+
+    string toString(){
+        stringstream ss;
+        ss<<this->id<<","<<this->nombre<<","<<this->password<<","<<this->telefono<<","<<this->turno;
+        return ss.str();
+    }
 };
 
 
@@ -46,3 +61,14 @@ void login();
 void parseLaboratorista(string &line, Laboratorista &lab);
 bool searchLaboratorista(string &labID, string &result);
 void solicitarContrasena(string &password);
+
+void addLab();
+
+bool findLabInDb(string &registro, string &expediente);
+
+void updateLab();
+
+void deleteLab();
+
+void getAllLabs();
+void getALab();

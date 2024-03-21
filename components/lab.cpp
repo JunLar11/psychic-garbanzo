@@ -4,6 +4,7 @@
 #include "headers/lab.hpp"
 #include "headers/sessioninit.hpp"
 
+
 //Métodos de la estructura Laboratorista
 Laboratorista::Laboratorista(string id, string nombre, string password, string telefono, string turn) {
     this->id = id;
@@ -95,7 +96,10 @@ void solicitarContrasena(string &password) {
 
     SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT));
 
-    
+    fflush(stdin);
+    cin.clear();
+    //Disable cin.ignore()
+    //cout << "\tIngrese su contraseña: ";
     getline(cin, password, '\n');
 
     SetConsoleMode(hStdin, mode);
@@ -105,15 +109,12 @@ void solicitarContrasena(string &password) {
 
 string passWordCipher(string &passWord){
     string passWordCipher = "";
-    for(int i = 0; i < passWord.length(); i++){
-        passWordCipher += passWord[i];
-        passWordCipher[i]=passWordCipher[i] + 3;
-        //Aplicar operacion NOT
-        passWordCipher[i] = ~passWordCipher[i];
-        //Aplicar la operacion OR respecto al caracter original
-        passWordCipher[i] = passWordCipher[i] | passWord[i];
-        passWordCipher[i] = passWordCipher[i] ^ passWord[i];
-        passWordCipher[i] = passWordCipher[i] & passWord[i];
+    for (int i = 0; i < passWord.length(); i++) {
+        passWordCipher += passWord[i] + 3;
+        //Aplicar AND con respecto al caracter original
+        if(passWord[i] % 2 == 0){
+            passWordCipher[i] += passWordCipher[i] - 1;
+        }
     }
     return passWordCipher;
 }
@@ -126,11 +127,13 @@ bool verifyPassword(string &passWord, string &passWordCiphered){
 }
 
 bool searchLaboratorista(string &labID, string &result) {
+    Laboratorista lab;
     ifstream file(LAB_TABLE_NAME, ios::in);
     string line;
     while (getline(file, line,'\n')) {
-        if (line.find(labID) != string::npos) {
-            result = line;
+        lab.getFromString(line);
+        if (lab.getId() == labID) {
+            result = lab.toString();
             return true;
         }
     }
@@ -176,6 +179,7 @@ void login() {
             return; ///< Termina la función.
         }else if(searchLaboratorista(userID, registro)){
             lab.getFromString(registro);
+            registro = lab.getPassword();
             if(verifyPassword(pass, registro)){
                 CurrentlyLoggedUser::login(lab.getNombre(), true, lab.getId());
                 return; 
@@ -198,4 +202,300 @@ void login() {
     exit(1);
 
     return; ///< Termina la función.
+}
+
+
+void addLab(){
+    Laboratorista user,existantUser;
+    string result,email;
+    fflush(stdin);
+    cin.clear();
+    cin.ignore();
+    
+    string entrada;
+    char correcto='s';
+    do{
+        system("cls");
+        cout<<"Registro de laboratoristas"<<endl;
+        cout<<"Ingrese su nombre: ";
+        cin>>entrada;
+        cin.ignore();
+        user.setNombre(entrada);
+        //cin.ignore();
+        cin.clear();
+        fflush(stdin);
+        
+        cout<<"Ingrese su contraseña: ";
+        solicitarContrasena(entrada);
+
+        user.setPassword(passWordCipher(entrada));
+        cout<<"Ingrese su telefono: ";
+        cin>>entrada;
+        user.setTelefono(entrada);
+        cout<<"Ingrese su turno: ";
+        cin>>entrada;
+        user.setTurno(entrada);
+        cout<<"Ingrese su ID: ";
+        cin>>entrada;
+        user.setId(entrada);
+
+        entrada=user.getId();
+        findLabInDb(result, entrada);
+        existantUser.getFromString(result);
+        if(existantUser.getId()== entrada){
+            cout<<"El ID ingresado ya existe"<<endl;
+            existantUser.show();
+            cout<<endl;
+            system("pause");
+            return;
+        }
+        entrada=user.getTelefono();
+        findLabInDb(result, entrada);
+        existantUser.getFromString(result);
+        if(existantUser.getTelefono()==user.getTelefono()){
+            cout<<"El telefono ya existe"<<endl;
+            existantUser.show();
+            cout<<endl;
+            system("pause");
+            return;
+        }
+
+        cout<<endl<<"\tDATOS REGISTRADOS:"<<endl;
+        user.show();
+        cout<<"\t¿Es correcto? (s/n): ";
+        cin>>correcto;
+        if(correcto!='s' && correcto!= 'S'){
+            return;
+        }
+
+    }while(correcto!='s' && correcto!= 'S');
+    ofstream archivo;
+    archivo.open(LAB_TABLE_NAME, ios::app);
+    archivo<<user.toString();
+    archivo.close();
+}
+
+bool findLabInDb(string &registro, string &expediente){
+    ifstream file(LAB_TABLE_NAME, ios::in);
+    string line;
+    Laboratorista user;
+    while (getline(file, line,'\n')) {
+        //mas estricta la busqueda
+        user.getFromString(line);
+        if(user.getId()==expediente||user.getTelefono()==expediente){
+            registro=line;
+            return true;
+
+        }
+    }
+    return false;
+}
+
+void updateLab(){
+    Laboratorista user,newUser,existantUser;
+    string result;
+    string expediente="";
+    string existente="";
+    string expediente2="";
+    fflush(stdin);
+    cin.clear();
+    cin.ignore();
+    cout<<"Modificación de laboratoristas"<<endl;
+    string entrada;
+    char correcto='s';
+    cout<<"\tIngrese el expediente o telefono del laboratorista: ";
+    cin>>expediente;
+    findLabInDb(result, expediente);
+    newUser.getFromString(result);
+    if(newUser.getId()==expediente || newUser.getTelefono()==expediente){
+        do{
+            newUser.show();
+            result=newUser.toString();
+            user.getFromString(result);
+            cin.clear();
+            cin.ignore();
+            fflush(stdin);
+            cout<<"\t¿Desea modificar el nombre? (s/n): ";
+            cin>>correcto;
+            
+            if(correcto =='s' || correcto == 'S'){
+                cin.clear();
+                cin.ignore();
+                fflush(stdin);  
+                cout<<"\tIngrese el nuevo nombre del laboratorista: ";
+                getline(cin, entrada, '\n');
+                user.setNombre(entrada);
+            }
+            cin.clear();
+            fflush(stdin);
+            cout<<"\t¿Desea modificar el numero de telefono? (s/n): ";
+            cin>>correcto;
+            
+            
+            if(correcto =='s' || correcto == 'S'){
+                cin.clear();
+                cin.ignore();
+                fflush(stdin);
+                cout<<"\tIngrese el nuevo telefono del laboratorista: ";
+                getline(cin, entrada, '\n');
+                user.setTelefono(entrada);
+            }
+            cin.clear();
+            fflush(stdin);
+            cout<<"\t¿Desea modificar la contraseña? (s/n): ";
+            cin>>correcto;
+            
+            if(correcto =='s' || correcto == 'S'){
+                cin.clear();
+                cin.ignore();
+                fflush(stdin);
+                cout<<"\tIngrese la nueva contraseña del laboratorista: ";
+                solicitarContrasena(entrada);
+                user.setPassword(passWordCipher(entrada));
+            }
+            cin.clear();
+            fflush(stdin);
+            cout<<"\t¿Desea modificar el turno? (s/n): ";
+            cin>>correcto;
+            
+            if(correcto =='s' || correcto == 'S'){
+                cin.clear();
+                cin.ignore();
+                fflush(stdin);
+                cout<<"\tIngrese el nuevo turno del laboratorista: ";
+                getline(cin, entrada, '\n');
+                user.setTurno(entrada);
+            }
+            cin.clear();
+            fflush(stdin);
+            cout<<"\t¿Desea modificar el ID? (s/n): ";
+            cin>>correcto;
+            
+            if(correcto =='s' || correcto == 'S'){
+                cin.clear();
+                cin.ignore();
+                fflush(stdin);
+                cout<<"\tIngrese el nuevo ID del laboratorista: ";
+                getline(cin, entrada, '\n');
+                user.setId(entrada);
+            }
+            expediente2=user.getId();
+            findLabInDb(existente, expediente2);
+            existantUser.getFromString(existente);
+
+            if(existantUser.getId()==user.getId()&&existantUser.getTelefono()!=user.getTelefono()&&existantUser.getNombre()!=user.getNombre()){
+                cout<<"El ID ya existe:"<<endl<<endl;
+                existantUser.show();
+                cout<<endl;
+                system("pause");
+                break;
+            }
+            expediente2=user.getTelefono();
+            findLabInDb(existente, expediente2);
+            existantUser.getFromString(existente);
+            if(existantUser.getId()!=user.getId()&&existantUser.getTelefono()==user.getTelefono()&&existantUser.getNombre()!=user.getNombre()){
+                cout<<"El telefono ya existe:"<<endl<<endl;
+                existantUser.show();
+                cout<<endl;
+                system("pause");
+                break;
+            }
+            if(existantUser.getId()==user.getId()&&existantUser.getTelefono()==user.getTelefono()&&existantUser.getNombre()==user.getNombre()&&existantUser.getPassword()==user.getPassword()){
+                cout<<"El laboratorista ya existe:"<<endl<<endl;
+                existantUser.show();
+                cout<<endl;
+                system("pause");
+                break;
+            }
+            
+            
+            user.show();
+            fflush(stdin);
+            cin.clear();
+            cout<<"\t¿Es correcto? (s/n): ";
+            cin>>correcto;
+            if(correcto =='s' || correcto == 'S'){
+                result=user.toString();
+                expediente=newUser.toString();
+                updateLine(LAB_TABLE_NAME, expediente, result);
+                system("pause");
+            }
+            
+
+
+            
+        }while(correcto!='s' && correcto!= 'S');
+    }else{
+        cout<<"El laboratorista no existe"<<endl;
+        system("pause");
+        cout<<"¿Desea registrar un nuevo laboratorista? (s/n): ";
+        cin>>correcto;
+        if(correcto =='s' || correcto == 'S'){
+            addLab();
+
+        }
+    }
+    return;
+}
+void deleteLab(){
+    Laboratorista user;
+    string result;
+    string expediente="";
+    fflush(stdin);
+    cin.clear();
+
+    cin.ignore();
+    cout<<"Eliminación de laboratoristas"<<endl;
+    string entrada;
+    char correcto='s';
+    cout<<"\tIngrese el expediente o correo electronico del laboratorista: ";
+    cin>>expediente;
+    findLabInDb(result, expediente);
+    user.getFromString(result);
+    if(user.getId()==expediente || user.getTelefono()==expediente){
+        user.show();
+        cout<<"\t¿Desea eliminar el laboratorista? (s/n): ";
+        cin>>correcto;
+        if(correcto =='s' || correcto == 'S'){
+            deleteFromFile(LAB_TABLE_NAME, result);
+            cout<<"Laboratorista eliminado"<<endl;
+            system("pause");
+        }
+    }else{
+        cout<<"El laboratorista no existe"<<endl;
+        system("pause");
+        
+    }
+}
+
+void getAllLabs(){
+    vector<string> users;
+    Laboratorista user;
+    cout<<"Mostrando todos los laboratoristas registrados"<<endl;
+    getAllFromFile(LAB_TABLE_NAME, users);
+    for(int i=0; i<users.size(); i++){
+        cout<<"------------Laboratorista "<<i+1<<"------------"<<endl;
+        user.getFromString(users[i]);
+        user.show();
+    }
+    system("pause");
+}
+void getALab(){
+    Laboratorista user;
+    string result;
+    string expediente="";
+    fflush(stdin);
+    cin.clear();
+    cout<<"Busqueda de un laboratorista"<<endl;
+    cout<<"Ingrese el expediente o telefono del laboratorista: ";
+    cin>>expediente;
+    findLabInDb(result, expediente);
+    if(result.empty()){
+        cout<<"El laboratorista no existe"<<endl;
+        system("pause");
+        return;
+    }
+    user.getFromString(result);
+    user.show();
+    system("pause");
 }

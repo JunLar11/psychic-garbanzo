@@ -108,7 +108,7 @@ public:
     }
 
     static void logout(){
-        setSession("", false, 0);
+        setSession("", false, 0,false);
     }
 
 

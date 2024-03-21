@@ -19,7 +19,7 @@ Se van a crear cuatro estructuras:
    >Materiales
    >Materia
    >Fecha préstamos
-   >Fecha de devolución
+   >Fecha de devolucion
    >Observaciones
    >Laboratorista
 -Usuario
@@ -43,6 +43,7 @@ using namespace std;
 
 
 int main() {
+   vector<MemPrestamos> prestamos;
    bool remainInProgram=false;
     setlocale(LC_CTYPE, "spanish");
     locale::global(locale("es_ES.utf8"));
@@ -51,6 +52,7 @@ int main() {
     creadorArchivos(MATERIALS_TABLE_NAME);
     creadorArchivos(BORROW_TABLE_NAME);
     creadorArchivos(USERS_TABLE_NAME);
+    creadorArchivos(LEND_TABLE_NAME);
 
     // Obtener el manejador de la ventana de consola
     HWND hwnd = GetConsoleWindow();
@@ -64,18 +66,12 @@ int main() {
 
     // Mostrar la ventana de consola en la barra de tareas
     ShowWindow(hwnd, SW_SHOW);
-
+    loadInMemoryBorrows(prestamos,LEND_TABLE_NAME); 
     do{
-      if(!CurrentlyLoggedUser::g_logged()){
-         login();
-      }
-      if(CurrentlyLoggedUser::g_logged()){
-         remainInProgram=mainMenu();
-      }
-      if(!remainInProgram){
-         CurrentlyLoggedUser::logout();
-      }
       system("cls");
+      login();
+      remainInProgram=mainMenu(prestamos);
+       
     }while(remainInProgram);
     cout<<"PROGRAMA FINALIZADO CON EXITO"<<endl;
     system("pause");

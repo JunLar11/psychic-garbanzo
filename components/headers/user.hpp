@@ -94,8 +94,13 @@ struct User{
 
 };
 
-User addUser();
+void addUser();
 
 bool findUserInDb(string &registro, string &expediente);
 
-User updateUser();
+void updateUser();
+
+void deleteUser();
+
+void getAllUsers();
+void getAUser();

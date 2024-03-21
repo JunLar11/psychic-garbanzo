@@ -11,6 +11,9 @@
 #include <sstream>
 #include<stdio.h>
 #include<vector>
+#include <ctime>
+#include <iomanip>
+#include <time.h>
 
 #define IDI_ICON1 101
 

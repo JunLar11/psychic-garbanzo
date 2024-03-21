@@ -1,10 +1,10 @@
 //Código de los distintos menus usados a lo largo del programa
 #include "headers/menus.hpp"
 #include "headers/sessions.hpp"
-bool mainMenu(){
-    vector<User> users;
-    users.reserve(10);
-
+bool mainMenu(vector<MemPrestamos> &prestamos){
+    //vector<User> users;
+    //users.reserve(10);
+    
     
 
     system("cls");
@@ -22,10 +22,10 @@ bool mainMenu(){
         cout<<"\t3. Materiales"<<endl;
         if(CurrentlyLoggedUser::g_userAccessLevel()){
             cout<<"\t4. Laboratoristas"<<endl;
-            cout<<"\t5. Reportes"<<endl;
+            //cout<<"\t5. Reportes"<<endl;
         }
         cout<<"\t'S'.Salir"<<endl;
-        cout<<"\t'C'.Cerrar sesión"<<endl;
+        //cout<<"\t'C'.Cerrar sesión"<<endl;
         cout<<"\tIngrese una opción: ";
         cin>>opcion;
         fflush(stdin);
@@ -36,13 +36,16 @@ bool mainMenu(){
         }
         switch(opcion){
             case '1':
-                salir = userMenu(users);
+                salir = userMenu();
                 break;
             case '2':
+                salir = prestamosMenu(prestamos);
                 break;
             case '3':
+                salir = materialsMenu();
                 break;
             case '4':
+                salir = laboratoristasMenu();
                 break;
             case '5':
                 break;
@@ -52,9 +55,13 @@ bool mainMenu(){
                 return true;
             case 'S':
             case 's':
+                CurrentlyLoggedUser::logout();
                 return false;
             default:
                 cout<<endl<<"\tIngrese una opción válida"<<endl;
+                fflush(stdin);
+                
+                
                 Sleep(2000);
                 break;
         }
@@ -73,12 +80,12 @@ bool mainMenu(){
     return false;
 }
 
-bool userMenu(vector<User> &users){
+bool userMenu(){
     
     char opcion='r';
-    bool inMemory=false;
+    string expediente="";
     do{
-        User user;
+        
         fflush(stdin);
         cin.clear();
         system("cls");
@@ -89,45 +96,36 @@ bool userMenu(vector<User> &users){
         cout<<"\t2. Modificar usuario"<<endl;
         cout<<"\t3. Eliminar usuario"<<endl;
         cout<<"\t4. Consultar usuarios"<<endl;
-        cout<<"\t5. Reporte usuarios"<<endl;
+        cout<<"\t5. Buscar usuario"<<endl;
         cout<<"\t'R'. Regresar al menú principal"<<endl;
         cout<<"\t'S'. Salir del programa"<<endl;
         cout<<"\tIngrese una opción: ";
+
         cin>>opcion;
         fflush(stdin);
+        system("cls");
+        cout<<"\t\t\t\tSistema de Administración del Laboratorio"<<endl;
+        cout<<"\tADMINISTRACION DE USUARIOS"<<endl;
+        
         switch(opcion){
             case '1':
                 
-                user=addUser();
-                for(int i=0;i<users.size();i++){
-                    if(users[i].getExpediente()==user.getExpediente()){
-                        inMemory=true;
-                    }
-                }
-                if(!inMemory){
-                    users.push_back(user);
-                }
+                addUser();
+                
                 break;
             case '2':
-                user=updateUser();
+                updateUser();
                 
-                if(user.getExpediente()==""){
-                    break;
-                }
-                for(int i=0;i<users.size();i++){
-                    if(users[i].getExpediente()==user.getExpediente()){
-                        inMemory=true;
-                    }
-                }
-                if(!inMemory){
-                    users.push_back(user);
-                }
+                
                 break;
-            case '3':
+            case '3'://Eliminar usuario
+                deleteUser();
                 break;
             case '4':
+                getAllUsers();
                 break;
             case '5':
+                getAUser();
                 break;
             case 'R':
             case 'r':
@@ -136,13 +134,196 @@ bool userMenu(vector<User> &users){
             case 's':
                 return true;
             default:
+                fflush(stdin);
+                cin.clear();
                 cout<<endl<<"\tIngrese una opción válida"<<endl;
                 Sleep(2000);
                 break;
         }
+    }while(opcion!='r'||opcion!='R'||opcion!='s'||opcion!='S');
+    return true;
+}
+bool materialsMenu(){
+    
+    char opcion='r';
+    string expediente="";
+    do{
+        
+        fflush(stdin);
+        cin.clear();
+        system("cls");
+        cout<<"\t\t\t\tSistema de Administración del Laboratorio"<<endl;
+        cout<<"\t\tMENU MATERIALES"<<endl;
+        cout<<"\tElige una de las siguientes opciones:"<<endl;
+        cout<<"\t1. Agregar material"<<endl;
+        cout<<"\t2. Modificar material"<<endl;
+        cout<<"\t3. Eliminar material"<<endl;
+        cout<<"\t4. Consultar materiales"<<endl;
+        cout<<"\t5. Buscar material"<<endl;
+        cout<<"\t'R'. Regresar al menú principal"<<endl;
+        cout<<"\t'S'. Salir del programa"<<endl;
+        cout<<"\tIngrese una opción: ";
 
-        inMemory=false;
+        cin>>opcion;
+        fflush(stdin);
+        system("cls");
+        cout<<"\t\t\t\tSistema de Administración del Laboratorio"<<endl;
+        cout<<"\tADMINISTRACION DE MATERIALES"<<endl;
+        
+        switch(opcion){
+            case '1':
+                
+                addMaterial();
+                
+                break;
+            case '2':
+                updateMaterial();
+                
+                
+                break;
+            case '3'://Eliminar usuario
+                deleteMaterial();
+                break;
+            case '4':
+                getAllMaterials();
+                break;
+            case '5':
+                getAMaterial();
+                break;
+            case 'R':
+            case 'r':
+                return false;
+            case 'S':
+            case 's':
+                return true;
+            default:
+                fflush(stdin);
+                
+                cout<<endl<<"\tIngrese una opción válida"<<endl;
+                Sleep(2000);
+                break;
+        }
     }while(opcion!='r'||opcion!='R'||opcion!='s'||opcion!='S');
     return true;
 }
 
+bool laboratoristasMenu(){
+    
+    char opcion='r';
+    string expediente="";
+    do{
+        
+        fflush(stdin);
+        cin.clear();
+        system("cls");
+        cout<<"\t\t\t\tSistema de Administración del Laboratorio"<<endl;
+        cout<<"\t\tMENU LABORATORISTAS"<<endl;
+        cout<<"\tElige una de las siguientes opciones:"<<endl;
+        cout<<"\t1. Agregar laboratoristas"<<endl;
+        cout<<"\t2. Modificar laboratoristas"<<endl;
+        cout<<"\t3. Eliminar laboratoristas"<<endl;
+        cout<<"\t4. Consultar laboratoristass"<<endl;
+        cout<<"\t5. Buscar laboratoristas"<<endl;
+        cout<<"\t'R'. Regresar al menú principal"<<endl;
+        cout<<"\t'S'. Salir del programa"<<endl;
+        cout<<"\tIngrese una opción: ";
+        
+        cin>>opcion;
+        fflush(stdin);
+        system("cls");
+        cout<<"\t\t\t\tSistema de Administración del Laboratorio"<<endl;
+        cout<<"\tADMINISTRACION DE LABORATORISTAS"<<endl;
+        
+        switch(opcion){
+            case '1':
+                
+                addLab();
+                
+                break;
+            case '2':
+                updateLab();
+                
+                
+                break; 
+            case '3'://Eliminar usuario
+                deleteLab();
+                break;
+            case '4':
+                getAllLabs();
+                break;
+            case '5':
+                getALab();
+                break;
+            case 'R':
+            case 'r':
+                return false;
+            case 'S':
+            case 's':
+                return true;
+            default:
+                fflush(stdin);
+                
+                cout<<endl<<"\tIngrese una opción válida"<<endl;
+                Sleep(2000);
+                break;
+        }
+    }while(opcion!='r'||opcion!='R'||opcion!='s'||opcion!='S');
+    return true;
+}
+bool prestamosMenu(vector<MemPrestamos> &prestamos){
+    
+    char opcion='r';
+    string expediente="";
+    do{
+        
+        fflush(stdin);
+        cin.clear();
+        system("cls");
+        cout<<"\t\t\t\tSistema de Administración del Laboratorio"<<endl;
+        cout<<"\t\tMENU PRESTAMOS"<<endl;
+        cout<<"\tElige una de las siguientes opciones:"<<endl;
+        cout<<"\t1. Realizar prestamo"<<endl;
+        //cout<<"\t2. Modificar prestamo"<<endl;
+        cout<<"\t2. Consultar devoluciones pendientes"<<endl;
+        cout<<"\t3. Realizar devolucion"<<endl;
+        cout<<"\t'R'. Regresar al menú principal"<<endl;
+        cout<<"\t'S'. Salir del programa"<<endl;
+        cout<<"\tIngrese una opción: ";
+        
+        cin>>opcion;
+        fflush(stdin);
+        system("cls");
+        cout<<"\t\t\t\tSistema de Administración del Laboratorio"<<endl;
+        cout<<"\tADMINISTRACION DE LABORATORISTAS"<<endl;
+        
+        switch(opcion){
+            case '1':
+                
+                prestar(prestamos);
+                
+                break;
+            case '2':
+                consultarPrestamosPendientes(prestamos);
+                
+                
+                break; 
+            case '3'://Eliminar usuario
+                devolver(prestamos);
+                break;
+                
+            case 'R':
+            case 'r':
+                return false;
+            case 'S':
+            case 's':
+                return true;
+            default:
+                fflush(stdin);
+                
+                cout<<endl<<"\tIngrese una opción válida"<<endl;
+                Sleep(2000);
+                break;
+        }
+    }while(opcion!='r'||opcion!='R'||opcion!='s'||opcion!='S');
+    return true;
+}

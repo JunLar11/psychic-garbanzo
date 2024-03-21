@@ -9,5 +9,11 @@
 
 
 
-bool mainMenu();
-bool userMenu(vector<User> &users);
+bool mainMenu(vector<MemPrestamos> &prestamos);
+bool userMenu();
+
+bool laboratoristasMenu();
+
+bool materialsMenu();
+
+bool prestamosMenu(vector<MemPrestamos> &prestamos);
